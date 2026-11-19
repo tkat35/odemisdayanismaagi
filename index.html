@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ödemiş Dayanışma Ağı · Demo</title>
+<meta name="description" content="Ödemiş Dayanışma Ağı işleyişini örnek verilerle gösteren demo sayfası.">
+<style>
+  :root {
+    --navy: #1f3557; --green: #3d7a50; --green-soft: #e6f0e9; --kiz: #c8102e; --kiz-soft: #fbe9ec;
+    --sydv: #2f6db3; --sydv-soft: #e7eff9; --iht: #c26a1b; --iht-soft: #fbefe3;
+    --ink: #22262c; --muted: #5d6673; --line: #dde3ea; --bg: #f5f7fa; --card: #ffffff;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; padding-bottom: 120px; }
+  h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; color: var(--navy); line-height: 1.2; margin: 0 0 .5em; }
+  h1 { font-size: clamp(26px, 4vw, 38px); }
+  h2 { font-size: 24px; }
+  h3 { font-size: 18px; }
+  p { margin: 0 0 .8em; }
+  a { color: var(--sydv); }
+  button, input, select, textarea { font: inherit; }
+  :focus-visible { outline: 3px solid #f2b705; outline-offset: 2px; }
+
+  /* Demo bandı */
+  .demo-band { background: var(--navy); color: #fff; font-size: 13.5px; padding: 6px 16px; display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap; }
+  .demo-band button { background: transparent; border: 1px solid rgba(255,255,255,.5); color: #fff; border-radius: 6px; padding: 2px 10px; cursor: pointer; font-size: 13px; }
+
+  /* Üst çubuk */
+  header.top { background: #fff; border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 20; }
+  .top-in { max-width: 1180px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-right: auto; }
+  .brand-mark { width: 38px; height: 38px; border-radius: 50%; background: var(--green); display: grid; place-items: center; }
+  .brand-mark svg { width: 22px; height: 22px; }
+  .brand-name { font-family: Georgia, serif; font-weight: 700; color: var(--green); font-size: 19px; line-height: 1.1; }
+  .brand-sub { font-size: 12.5px; color: var(--muted); }
+  nav.main { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .nav-link { text-decoration: none; color: var(--ink); padding: 7px 12px; border-radius: 8px; font-size: 15px; }
+  .nav-link:hover { background: var(--bg); }
+  .nav-link.active { background: var(--green-soft); color: var(--green); font-weight: 600; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; border-radius: 8px; padding: 8px 14px; cursor: pointer; font-weight: 600; font-size: 15px; text-decoration: none; line-height: 1.2; }
+  .btn-primary { background: var(--green); color: #fff; }
+  .btn-primary:hover { background: #33683f; }
+  .btn-outline { background: #fff; border-color: var(--line); color: var(--ink); }
+  .btn-outline:hover { border-color: #b9c3cf; }
+  .btn-kiz { background: var(--kiz); color: #fff; }
+  .btn-sydv { background: var(--sydv); color: #fff; }
+  .btn-danger { background: #fff; color: #a3192c; border-color: #e6b8bf; }
+  .btn-sm { padding: 5px 10px; font-size: 14px; }
+  .btn[disabled] { opacity: .5; cursor: not-allowed; }
+  .user-chip { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+  .bell { position: relative; text-decoration: none; color: var(--ink); padding: 6px; border-radius: 8px; }
+  .bell svg { width: 22px; height: 22px; vertical-align: middle; }
+  .bell .count { position: absolute; top: 0; right: -2px; background: var(--kiz); color: #fff; font-size: 11px; border-radius: 9px; padding: 0 5px; font-weight: 700; }
+  .panel-links { display: flex; gap: 6px; align-items: center; border-left: 1px solid var(--line); padding-left: 12px; }
+  .panel-links span { font-size: 13px; color: var(--muted); }
+  .pl { text-decoration: none; font-size: 14px; font-weight: 600; padding: 6px 10px; border-radius: 8px; }
+  .pl.kiz { color: var(--kiz); background: var(--kiz-soft); }
+  .pl.sydv { color: var(--sydv); background: var(--sydv-soft); }
+  .pl.kay { color: var(--navy); background: #e8ecf2; }
+
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 16px; }
+
+  /* Vitrin */
+  .hero { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; align-items: center; margin-bottom: 22px; }
+  .hero p { color: var(--muted); max-width: 60ch; font-size: 17px; }
+  .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+  .rules { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; font-size: 14.5px; }
+  .rules h3 { font-size: 16px; margin-bottom: 6px; }
+  .rules ul { margin: 0; padding-left: 18px; color: var(--muted); }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 16px; }
+  .chip { border: 1px solid var(--line); background: #fff; border-radius: 20px; padding: 6px 14px; cursor: pointer; font-size: 14.5px; }
+  .chip[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+  .item { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+  .item-img { aspect-ratio: 4 / 3; display: grid; place-items: center; position: relative; }
+  .item-img img { width: 100%; height: 100%; object-fit: cover; }
+  .item-img svg { width: 42%; height: auto; }
+  .item-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+  .item-title { font-weight: 700; font-size: 16.5px; }
+  .item-meta { font-size: 13.5px; color: var(--muted); }
+  .item-foot { margin-top: auto; display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-top: 6px; }
+  .badge { display: inline-block; font-size: 12.5px; padding: 2px 9px; border-radius: 12px; font-weight: 600; white-space: nowrap; }
+  .b-wait { background: #fff4d6; color: #7a5a00; }
+  .b-ok { background: var(--green-soft); color: var(--green); }
+  .b-blue { background: var(--sydv-soft); color: var(--sydv); }
+  .b-red { background: var(--kiz-soft); color: #a3192c; }
+  .b-grey { background: #eceff3; color: var(--muted); }
+  .b-orange { background: var(--iht-soft); color: #8a4a10; }
+  .item-img .badge { position: absolute; top: 10px; left: 10px; }
+  .empty { background: #fff; border: 1px dashed #c4ccd6; border-radius: var(--radius); padding: 28px; text-align: center; color: var(--muted); }
+
+  /* Formlar */
+  .form-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  .card + .card { margin-top: 16px; }
+  .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
+  .field label { font-weight: 600; font-size: 14.5px; }
+  .field .hint { font-size: 13px; color: var(--muted); }
+  .field input, .field select, .field textarea { border: 1px solid #c5cdd7; border-radius: 8px; padding: 9px 11px; background: #fff; width: 100%; }
+  .field textarea { min-height: 80px; resize: vertical; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .check { display: flex; gap: 8px; align-items: flex-start; font-size: 14.5px; margin-bottom: 14px; }
+  .check input { margin-top: 4px; }
+  .aside-note { font-size: 14.5px; color: var(--muted); }
+  .aside-note h3 { font-size: 16px; }
+  .err { color: #a3192c; font-size: 14px; margin: -6px 0 12px; }
+  .photo-prev { width: 100%; max-width: 220px; border-radius: 8px; margin-top: 6px; display: none; }
+
+  /* Paneller */
+  .panel-head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; flex-wrap: wrap; }
+  .panel-head .tag { padding: 6px 12px; border-radius: 8px; font-weight: 700; color: #fff; }
+  .panel-head p { margin: 0; color: var(--muted); font-size: 14.5px; }
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 16px; flex-wrap: wrap; }
+  .tab { text-decoration: none; background: none; border: none; padding: 10px 14px; cursor: pointer; font-weight: 600; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -1px; }
+  .tab[aria-selected="true"] { color: var(--ink); border-bottom-color: currentColor; }
+  .theme-kiz .tab[aria-selected="true"] { color: var(--kiz); }
+  .theme-sydv .tab[aria-selected="true"] { color: var(--sydv); }
+  .tab .n { background: #eceff3; border-radius: 10px; padding: 0 7px; font-size: 12.5px; margin-left: 4px; }
+  .table-wrap { overflow-x: auto; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); }
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  th { text-align: left; background: #f0f3f7; color: var(--muted); font-weight: 600; padding: 10px 12px; font-size: 13.5px; white-space: nowrap; }
+  td { padding: 10px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+  td .sub { font-size: 13px; color: var(--muted); }
+  .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .warn { background: #fff4d6; color: #6b4f00; border-radius: 6px; padding: 4px 8px; font-size: 13px; margin-top: 4px; }
+  .thumb { width: 54px; height: 42px; border-radius: 6px; display: grid; place-items: center; overflow: hidden; flex-shrink: 0; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .thumb svg { width: 60%; }
+  .with-thumb { display: flex; gap: 10px; align-items: center; }
+  .note-staff { font-size: 13.5px; color: var(--muted); margin-top: 10px; }
+
+  /* Özet */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .stat { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
+  .stat .v { font-family: Georgia, serif; font-size: 30px; color: var(--navy); font-weight: 700; }
+  .stat .l { font-size: 14px; color: var(--muted); }
+  .log { list-style: none; margin: 0; padding: 0; }
+  .log li { padding: 8px 0; border-top: 1px solid var(--line); font-size: 14.5px; display: flex; gap: 10px; }
+  .log li:first-child { border-top: none; }
+  .log time { color: var(--muted); font-size: 13px; white-space: nowrap; min-width: 92px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 7px; flex-shrink: 0; }
+
+  /* Süreç şeridi */
+  .flow { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 1px solid var(--line); box-shadow: 0 -4px 16px rgba(31,53,87,.08); z-index: 30; }
+  .flow-in { max-width: 1180px; margin: 0 auto; padding: 8px 16px 10px; }
+  .flow-title { font-size: 12.5px; color: var(--muted); margin-bottom: 4px; display: flex; justify-content: space-between; gap: 8px; }
+  .flow-steps { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+  .fs { border: 1px solid var(--line); background: #fff; border-radius: 8px; padding: 6px 8px; text-align: left; cursor: pointer; display: flex; gap: 7px; align-items: center; min-width: 0; color: var(--ink); }
+  .fs .num { width: 22px; height: 22px; border-radius: 50%; color: #fff; font-weight: 700; font-size: 12.5px; display: grid; place-items: center; flex-shrink: 0; }
+  .fs .txt { font-size: 12.5px; line-height: 1.25; overflow: hidden; }
+  .fs .who { font-size: 11px; color: var(--muted); display: block; }
+  .fs.done { background: #f3f8f4; }
+  .fs.current { border-color: var(--navy); box-shadow: 0 0 0 2px var(--navy) inset; }
+  .fs.pulse { animation: pulse 1.2s ease-out 1; }
+  @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(242,183,5,.9); } 100% { box-shadow: 0 0 0 12px rgba(242,183,5,0); } }
+
+  /* Bildirim kutusu */
+  .toast { position: fixed; right: 16px; bottom: 112px; background: var(--navy); color: #fff; padding: 12px 16px; border-radius: 10px; max-width: 360px; font-size: 14.5px; z-index: 40; box-shadow: 0 8px 24px rgba(0,0,0,.18); transform: translateY(20px); opacity: 0; transition: .25s; pointer-events: none; }
+  .toast.show { transform: none; opacity: 1; }
+
+  .muted { color: var(--muted); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .login-list { display: grid; gap: 10px; }
+  .login-opt { display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: #fff; }
+
+  @media (max-width: 900px) {
+    .hero, .form-wrap { grid-template-columns: 1fr; }
+    .panel-links { border-left: none; padding-left: 0; }
+    .flow-steps { grid-template-columns: repeat(4, 1fr); }
+    .fs .who { display: none; }
+    body { padding-bottom: 150px; }
+    .toast { bottom: 150px; }
+  }
+  @media (max-width: 560px) {
+    .row2 { grid-template-columns: 1fr; }
+    .flow-steps { grid-template-columns: repeat(8, 1fr); gap: 3px; }
+    .fs { padding: 5px; justify-content: center; }
+    .fs .txt { display: none; }
+    .flow-title { display: none; }
+    body { padding-bottom: 72px; }
+    .toast { bottom: 96px; left: 16px; right: 16px; max-width: none; }
+    .nav-link { padding: 6px 8px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .fs.pulse { animation: none; } .toast { transition: none; } }
+</style>
+</head>
+<body>
+<div class="demo-band" role="note">
+  <span>Demo sürümü: tüm kişiler ve eşyalar örnek veridir. Veriler yalnızca bu tarayıcıda tutulur.</span>
+  <button type="button" id="resetBtn">Demoyu sıfırla</button>
+</div>
+
+<header class="top">
+  <div class="top-in">
+    <a class="brand" href="#/vitrin" aria-label="Ödemiş Dayanışma Ağı ana sayfa">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></span>
+      <span><span class="brand-name">Ödemiş Dayanışma Ağı</span><br><span class="brand-sub">Paylaşmanın ortak noktası</span></span>
+    </a>
+    <nav class="main" aria-label="Ana menü" id="mainNav"></nav>
+    <div class="panel-links" aria-label="Yönetim panelleri">
+      <span>Yönetim:</span>
+      <a class="pl kiz" href="#/panel/kizilay">Kızılay</a>
+      <a class="pl sydv" href="#/panel/sydv">SYDV</a>
+      <a class="pl kay" href="#/panel/kaymakamlik">Kaymakamlık</a>
+    </div>
+  </div>
+</header>
+
+<main id="app" tabindex="-1"></main>
+
+<div class="flow" aria-label="Süreç adımları">
+  <div class="flow-in">
+    <div class="flow-title"><span>Bağıştan dayanışmaya sekiz adım: son işlemin adımı vurgulanır, adıma tıklayınca ilgili ekran açılır.</span></div>
+    <div class="flow-steps" id="flowSteps"></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  "use strict";
+  const DAY = 86400000;
+  const KEY = "odemis-dayanisma-demo-v1";
+  const COLORS = { bagisci: "#3d7a50", kizilay: "#c8102e", sydv: "#2f6db3", ihtiyac: "#c26a1b" };
+  const STEPS = [
+    { n: 1, who: "Bağışçı", c: "bagisci", t: "Bağış kaydı", go: "#/bagis" },
+    { n: 2, who: "Kızılay", c: "kizilay", t: "Eşya incelemesi", go: "#/panel/kizilay" },
+    { n: 3, who: "Kızılay", c: "kizilay", t: "Onay ve vitrin", go: "#/vitrin" },
+    { n: 4, who: "SYDV", c: "sydv", t: "İhtiyaç sahibi onayı", go: "#/panel/sydv" },
+    { n: 5, who: "İhtiyaç sahibi", c: "ihtiyac", t: "Ürün talebi", go: "#/vitrin" },
+    { n: 6, who: "SYDV", c: "sydv", t: "Talep değerlendirmesi", go: "#/panel/sydv/talepler" },
+    { n: 7, who: "Kızılay", c: "kizilay", t: "Lojistik", go: "#/panel/kizilay/lojistik" },
+    { n: 8, who: "Kızılay", c: "kizilay", t: "Teslim ve kapanış", go: "#/panel/kizilay/lojistik" },
+  ];
+  const CATS = ["Beyaz eşya", "Mobilya", "Mutfak gereçleri"];
+  const CAT_BG = { "Beyaz eşya": "#e7eff9", "Mobilya": "#f3ece3", "Mutfak gereçleri": "#e6f0e9" };
+  const ICONS = {
+    buzdolabi: '<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M6 9h12M9 5v2M9 12v3"/>',
+    camasir: '<rect x="4" y="2" width="16" height="20" rx="2"/><circle cx="12" cy="13" r="5"/><path d="M7 5h2M12 5h5"/>',
+    firin: '<rect x="3" y="4" width="18" height="16" rx="2"/><rect x="6" y="9" width="12" height="8" rx="1"/><path d="M7 6.5h1M10 6.5h1M13 6.5h4"/>',
+    kanepe: '<path d="M4 11V8a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/><path d="M2 13a2 2 0 0 1 4 0v2h12v-2a2 2 0 0 1 4 0v4H2z"/><path d="M5 17v2M19 17v2"/>',
+    masa: '<path d="M3 9h18M5 9v10M19 9v10M8 13h8"/>',
+    gardirop: '<rect x="4" y="2" width="16" height="19" rx="1"/><path d="M12 2v19M10 10v2M14 10v2M6 21v1M18 21v1"/>',
+    yatak: '<path d="M3 18V8M3 14h18v4M21 18v-4a3 3 0 0 0-3-3h-8v3"/><circle cx="7" cy="11" r="1.5"/>',
+    tencere: '<path d="M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M2 10h2M20 10h2M9 6c0-1 1-2 3-2s3 1 3 2"/>',
+    tabak: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/>',
+    kutu: '<path d="M3 7l9-4 9 4-9 4z"/><path d="M3 7v10l9 4 9-4V7M12 11v10"/>',
+  };
+  const iconFor = (it) => it.icon || ({ "Beyaz eşya": "buzdolabi", "Mobilya": "kanepe", "Mutfak gereçleri": "tencere" }[it.category]) || "kutu";
+  const svgIcon = (name, color) => `<svg viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ICONS.kutu}</svg>`;
+  const catColor = (c) => ({ "Beyaz eşya": "#2f6db3", "Mobilya": "#8a5a2b", "Mutfak gereçleri": "#3d7a50" }[c] || "#5d6673");
+
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
+  const uid = () => Math.random().toString(36).slice(2, 9);
+  const fmtDate = (t) => new Date(t).toLocaleDateString("tr-TR", { day: "2-digit", month: "2-digit", year: "numeric" });
+  const fmtTime = (t) => new Date(t).toLocaleString("tr-TR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
+  const maskTc = (tc) => tc ? tc.slice(0, 3) + "******" + tc.slice(-2) : "-";
+
+  /* ---------- Örnek veri ---------- */
+  function seed() {
+    const now = Date.now();
+    const users = [
+      { id: "u-b1", role: "bagisci", name: "Ayşe Demir (örnek)", tc: "11111111110", phone: "0555 000 00 01", email: "ayse@ornek.test", district: "Ödemiş · Cumhuriyet Mah.", createdAt: now - 40 * DAY },
+      { id: "u-b2", role: "bagisci", name: "Mehmet Kaya (örnek)", tc: "22222222220", phone: "0555 000 00 02", email: "mehmet@ornek.test", district: "Ödemiş · Hacıhalil Mah.", createdAt: now - 35 * DAY },
+      { id: "u-i1", role: "ihtiyac", name: "Fatma Yıldız (örnek)", tc: "33333333330", phone: "0555 000 00 03", email: "", address: "Örnek Sok. No: 1, Ödemiş", household: 4, status: "onayli", createdAt: now - 60 * DAY, approvedAt: now - 55 * DAY },
+      { id: "u-i2", role: "ihtiyac", name: "Ali Şahin (örnek)", tc: "44444444440", phone: "0555 000 00 04", email: "", address: "Örnek Cad. No: 7, Ödemiş", household: 3, status: "onayli", createdAt: now - 120 * DAY, approvedAt: now - 115 * DAY },
+      { id: "u-i3", role: "ihtiyac", name: "Zeynep Arslan (örnek)", tc: "55555555550", phone: "0555 000 00 05", email: "", address: "Deneme Sok. No: 3, Ödemiş", household: 5, status: "onay-bekliyor", createdAt: now - 1 * DAY },
+    ];
+    const mk = (id, donorId, title, category, icon, condition, desc, status, daysAgo) => ({
+      id, donorId, title, category, icon, condition, desc, status, photo: "",
+      createdAt: now - (daysAgo + 2) * DAY, publishedAt: status === "inceleme" ? null : now - daysAgo * DAY,
+      allocatedTo: null, history: [{ t: now - (daysAgo + 2) * DAY, text: "Bağış kaydı oluşturuldu", step: 1 }].concat(status === "inceleme" ? [] : [{ t: now - daysAgo * DAY, text: "Kızılay onayladı, vitrinde yayımlandı", step: 3 }]),
+    });
+    const items = [
+      mk("i1", "u-b1", "Buzdolabı (çift kapılı)", "Beyaz eşya", "buzdolabi", "İyi", "Çalışır durumda, 5 yıllık.", "vitrinde", 4),
+      mk("i2", "u-b2", "Üçlü kanepe", "Mobilya", "kanepe", "Az kullanılmış", "Gri kumaş, lekesiz.", "vitrinde", 9),
+      mk("i3", "u-b1", "Çamaşır makinesi", "Beyaz eşya", "camasir", "İyi", "7 kg, sorunsuz çalışıyor.", "vitrinde", 12),
+      mk("i4", "u-b2", "Yemek masası ve 4 sandalye", "Mobilya", "masa", "Orta", "Ahşap, küçük çizikler var.", "vitrinde", 20),
+      mk("i5", "u-b1", "Tencere seti (6 parça)", "Mutfak gereçleri", "tencere", "Az kullanılmış", "Çelik, kapaklarıyla birlikte.", "vitrinde", 2),
+      mk("i6", "u-b2", "İki kapaklı gardırop", "Mobilya", "gardirop", "İyi", "Sökülüp taşınabilir.", "vitrinde", 25),
+      mk("i7", "u-b1", "Yemek takımı (24 parça)", "Mutfak gereçleri", "tabak", "İyi", "Eksiksiz.", "vitrinde", 6),
+      mk("i8", "u-b2", "Ankastre fırın", "Beyaz eşya", "firin", "Orta", "Çalışıyor, kapak camında çizik var.", "inceleme", 0),
+      mk("i0", "u-b1", "Tek kişilik yatak", "Mobilya", "yatak", "İyi", "Bazasıyla birlikte.", "tamamlandi", 70),
+    ];
+    // Ali Şahin'e 50 gün önce mobilya teslim edildi (90 gün ve 1 yıl kurallarını göstermek için)
+    items[8].allocatedTo = "u-i2"; items[8].deliveredAt = now - 50 * DAY;
+    items[8].history.push({ t: now - 55 * DAY, text: "SYDV tahsis kararı verdi", step: 6 }, { t: now - 50 * DAY, text: "Kızılay teslim etti, ilan tamamlandı", step: 8 });
+    const requests = [
+      { id: "r1", itemId: "i2", userId: "u-i2", status: "alindi", createdAt: now - 1 * DAY },
+      { id: "r0", itemId: "i0", userId: "u-i2", status: "teslim", createdAt: now - 58 * DAY },
+    ];
+    items[1].status = "degerlendirme";
+    return { users, items, requests, notifications: [], currentUserId: null, lastStep: 0, doneSteps: [] };
+  }
+
+  let state;
+  function load() {
+    try { const raw = localStorage.getItem(KEY); if (raw) { state = JSON.parse(raw); return; } } catch (e) { /* ignore */ }
+    state = seed();
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* tarayıcı depolamaya izin vermiyorsa yalnız bellekte kalır */ } }
+
+  const user = (id) => state.users.find((u) => u.id === id);
+  const item = (id) => state.items.find((i) => i.id === id);
+  const me = () => user(state.currentUserId);
+
+  function mark(step, text, itemObj) {
+    state.lastStep = step;
+    if (!state.doneSteps.includes(step)) state.doneSteps.push(step);
+    if (itemObj) itemObj.history.push({ t: Date.now(), text, step });
+    else (state.log = state.log || []).push({ t: Date.now(), text, step });
+    save();
+    renderFlow(true);
+  }
+  function notify(userId, text) { state.notifications.push({ id: uid(), userId, text, t: Date.now(), read: false }); }
+  function toast(msg) {
+    const el = document.getElementById("toast");
+    el.textContent = msg; el.classList.add("show");
+    clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove("show"), 3200);
+  }
+
+  /* ---------- Durum etiketleri ---------- */
+  const ITEM_STATUS = {
+    inceleme: ["İnceleme bekliyor", "b-wait"], vitrinde: ["Vitrinde", "b-ok"], degerlendirme: ["Değerlendirme aşamasında", "b-blue"],
+    tahsis: ["Tahsis edildi", "b-orange"], "teslim-alindi": ["Kızılay teslim aldı", "b-orange"], tamamlandi: ["Tamamlandı", "b-grey"],
+    reddedildi: ["Reddedildi", "b-red"], pasif: ["Pasif (süre doldu)", "b-grey"],
+  };
+  const REQ_STATUS = { alindi: ["SYDV değerlendirmesinde", "b-blue"], onaylandi: ["Onaylandı, teslimat bekleniyor", "b-orange"], reddedildi: ["Reddedildi", "b-red"], teslim: ["Teslim edildi", "b-ok"] };
+  const USER_STATUS = { "onay-bekliyor": ["SYDV onayı bekleniyor", "b-wait"], onayli: ["Onaylı ihtiyaç sahibi", "b-ok"], reddedildi: ["Reddedildi", "b-red"] };
+  const badge = (map, key) => { const [t, c] = map[key] || [key, "b-grey"]; return `<span class="badge ${c}">${esc(t)}</span>`; };
+  const daysLeft = (it) => it.publishedAt ? Math.max(0, 30 - Math.floor((Date.now() - it.publishedAt) / DAY)) : null;
+  const visual = (it, cls = "item-img") => `<div class="${cls}" style="background:${CAT_BG[it.category] || "#eef1f5"}">${it.photo ? `<img src="${it.photo}" alt="${esc(it.title)} fotoğrafı">` : svgIcon(iconFor(it), catColor(it.category))}`;
+
+  /* ---------- Üst menü ---------- */
+  function renderNav(route) {
+    const u = me();
+    const unread = u ? state.notifications.filter((n) => n.userId === u.id && !n.read).length : 0;
+    const link = (href, text) => `<a class="nav-link${route.startsWith(href.slice(1)) ? " active" : ""}" href="${href}">${text}</a>`;
+    let html = link("#/vitrin", "Vitrin");
+    if (!u || u.role === "bagisci") html += link("#/bagis", "Bağış yap");
+    if (u) {
+      html += `<a class="bell" href="#/hesabim" aria-label="Hesabım, ${unread} okunmamış bildirim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>${unread ? `<span class="count">${unread}</span>` : ""}</a>`;
+      html += `<span class="user-chip"><a class="nav-link${route.startsWith("/hesabim") ? " active" : ""}" href="#/hesabim">${esc(u.name.replace(" (örnek)", ""))}</a><button class="btn btn-outline btn-sm" type="button" data-act="logout">Çıkış</button></span>`;
+    } else {
+      html += `<a class="btn btn-outline btn-sm" href="#/giris">Giriş yap</a><a class="btn btn-primary btn-sm" href="#/kayit">Kayıt ol</a>`;
+    }
+    document.getElementById("mainNav").innerHTML = html;
+  }
+
+  /* ---------- Süreç şeridi ---------- */
+  function renderFlow(pulse) {
+    document.getElementById("flowSteps").innerHTML = STEPS.map((s) => {
+      const cls = ["fs", state.doneSteps.includes(s.n) ? "done" : "", state.lastStep === s.n ? "current" : "", pulse && state.lastStep === s.n ? "pulse" : ""].join(" ");
+      return `<button type="button" class="${cls}" data-go="${s.go}" aria-label="Adım ${s.n}: ${s.t} (${s.who})"${state.lastStep === s.n ? ' aria-current="step"' : ""}><span class="num" style="background:${COLORS[s.c]}">${s.n}</span><span class="txt">${s.t}<span class="who">${s.who}</span></span></button>`;
+    }).join("");
+  }
+
+  /* ---------- Sayfalar ---------- */
+  let catFilter = "Tümü";
+  function viewVitrin() {
+    const list = state.items.filter((i) => ["vitrinde", "degerlendirme"].includes(i.status) && (catFilter === "Tümü" || i.category === catFilter))
+      .sort((a, b) => b.publishedAt - a.publishedAt);
+    const u = me();
+    return `
+    <section class="hero">
+      <div>
+        <h1>İhtiyaç fazlası eşyalar, kurum onayıyla ihtiyaç sahibine ulaşıyor</h1>
+        <p>Vitrindeki her eşya Türk Kızılay Ödemiş Şubesi tarafından incelendi. Talepleri Ödemiş SYDV değerlendirir, teslimatı Kızılay yapar. Bağışçı ve ihtiyaç sahibi birbirinin bilgilerini görmez.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#/bagis">Eşya bağışla</a>
+          <a class="btn btn-outline" href="#/kayit/ihtiyac">İhtiyaç sahibi olarak kayıt ol</a>
+        </div>
+      </div>
+      <aside class="rules" aria-label="Talep kuralları">
+        <h3>Talep kuralları</h3>
+        <ul>
+          <li>Talep için SYDV onaylı ihtiyaç sahibi olmak gerekir.</li>
+          <li>Aynı anda en fazla iki aktif talep.</li>
+          <li>Aynı haneye 90 günde en fazla bir ürün.</li>
+          <li>Aynı tür eşya bir yıl sonra yeniden talep edilebilir.</li>
+          <li>Kabul edilenler: beyaz eşya, mobilya, mutfak gereçleri. İkinci el kıyafet kabul edilmez.</li>
+        </ul>
+      </aside>
+    </section>
+    <h2>Vitrin</h2>
+    <div class="filters" role="group" aria-label="Kategori">
+      ${["Tümü", ...CATS].map((c) => `<button type="button" class="chip" data-cat="${c}" aria-pressed="${c === catFilter}">${c}</button>`).join("")}
+    </div>
+    ${list.length ? `<div class="grid">${list.map((it) => {
+      const mine = u && state.requests.find((r) => r.itemId === it.id && r.userId === u.id && r.status === "alindi");
+      let btn;
+      if (mine) btn = `<span class="badge b-blue">Talebiniz alındı</span>`;
+      else if (u && u.role === "bagisci") btn = "";
+      else btn = `<button type="button" class="btn btn-primary btn-sm" data-act="request" data-id="${it.id}">Talep et</button>`;
+      return `<article class="item">
+        ${visual(it)}${it.status === "degerlendirme" ? `<span class="badge b-blue">Değerlendirme aşamasında</span>` : ""}</div>
+        <div class="item-body">
+          <div class="item-title">${esc(it.title)}</div>
+          <div class="item-meta">${esc(it.category)} · Durumu: ${esc(it.condition)}</div>
+          <div class="item-meta">${esc(it.desc)}</div>
+          <div class="item-foot"><span class="item-meta">Yayında: ${daysLeft(it)} gün kaldı</span>${btn}</div>
+        </div></article>`;
+    }).join("")}</div>` : `<div class="empty">Bu kategoride şu an vitrinde eşya yok.</div>`}`;
+  }
+
+  function viewKayitSecim() {
+    return `<h1>Kayıt ol</h1>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+      <div class="card"><h2>Bağışçı</h2><p class="muted">Kullanılabilir durumdaki eşyanızı bağışlamak için kayıt olun. Eşyanız Kızılay incelemesinden sonra vitrinde yayımlanır.</p><a class="btn btn-primary" href="#/kayit/bagisci">Bağışçı olarak kayıt ol</a></div>
+      <div class="card"><h2>İhtiyaç sahibi</h2><p class="muted">Vitrindeki eşyaları talep edebilmek için kayıt olun. Kaydınızı Ödemiş SYDV doğrular ve onaylar.</p><a class="btn btn-primary" href="#/kayit/ihtiyac">İhtiyaç sahibi olarak kayıt ol</a></div>
+    </div>`;
+  }
+
+  function viewKayit(role) {
+    const ihtiyac = role === "ihtiyac";
+    return `<h1>${ihtiyac ? "İhtiyaç sahibi kaydı" : "Bağışçı kaydı"}</h1>
+    <div class="form-wrap">
+      <form class="card" id="regForm" novalidate>
+        <div class="field"><label for="f-name">Ad soyad</label><input id="f-name" name="name" required autocomplete="name"></div>
+        <div class="row2">
+          <div class="field"><label for="f-tc">T.C. kimlik numarası</label><input id="f-tc" name="tc" inputmode="numeric" maxlength="11" required><span class="hint">Demoda 11 haneli herhangi bir sayı girin.</span></div>
+          <div class="field"><label for="f-phone">Telefon</label><input id="f-phone" name="phone" inputmode="tel" required autocomplete="tel"></div>
+        </div>
+        ${ihtiyac ? `
+        <div class="field"><label for="f-address">Açık adres</label><textarea id="f-address" name="address" required></textarea><span class="hint">SYDV doğrulaması ve teslimat için kullanılır.</span></div>
+        <div class="row2">
+          <div class="field"><label for="f-house">Hanede yaşayan kişi sayısı</label><input id="f-house" name="household" type="number" min="1" max="20" value="1" required></div>
+          <div class="field"><label for="f-email">E-posta (isteğe bağlı)</label><input id="f-email" name="email" type="email" autocomplete="email"></div>
+        </div>` : `
+        <div class="row2">
+          <div class="field"><label for="f-email">E-posta</label><input id="f-email" name="email" type="email" required autocomplete="email"></div>
+          <div class="field"><label for="f-district">Mahalle</label><input id="f-district" name="district" required placeholder="Örneğin Cumhuriyet Mah."></div>
+        </div>`}
+        <label class="check"><input type="checkbox" name="kvkk" required> <span>Aydınlatma metnini okudum. Bilgilerimin yalnızca bu işleyiş için kullanılacağını biliyorum.</span></label>
+        <p class="err" id="regErr" hidden></p>
+        <button class="btn btn-primary" type="submit">Kayıt ol</button>
+      </form>
+      <aside class="card aside-note">
+        <h3>Bilgileriniz kimde görünür?</h3>
+        ${ihtiyac ? `<p>Kaydınızı Ödemiş SYDV doğrular. Kızılay yalnızca teslimat için adınızı, telefonunuzu ve adresinizi görür. Bağışçılar sizi göremez.</p><p>Gelir, sağlık gibi bilgiler platformda istenmez.</p>` : `<p>Bilgilerinizi yalnızca Kızılay bağış ve lojistik görevlileri görür. T.C. kimlik numaranız panelde maskelenir. İhtiyaç sahipleri bilgilerinizi göremez.</p><p>Açık adres, eşya teslim alınırken Kızılay tarafından sorulur.</p>`}
+      </aside>
+    </div>`;
+  }
+
+  function viewGiris() {
+    const opts = state.users.filter((u) => u.role !== "staff");
+    return `<h1>Giriş yap</h1>
+    <div class="form-wrap">
+      <div class="card">
+        <p class="muted">Demoda şifre yoktur. Aşağıdaki hesaplardan biriyle giriş yapın.</p>
+        <div class="login-list">
+          ${opts.map((u) => `<div class="login-opt"><div><strong>${esc(u.name)}</strong><br><span class="muted" style="font-size:14px">${u.role === "bagisci" ? "Bağışçı" : "İhtiyaç sahibi"}${u.role === "ihtiyac" ? " · " + USER_STATUS[u.status][0] : ""}</span></div><button class="btn btn-outline btn-sm" type="button" data-act="login" data-id="${u.id}">Bu hesapla gir</button></div>`).join("")}
+        </div>
+      </div>
+      <aside class="card aside-note"><h3>Hesabınız yok mu?</h3><p>Bağışçı ya da ihtiyaç sahibi olarak kayıt olabilirsiniz.</p><a class="btn btn-primary" href="#/kayit">Kayıt ol</a></aside>
+    </div>`;
+  }
+
+  function viewBagis() {
+    const u = me();
+    if (!u || u.role !== "bagisci") {
+      return `<h1>Eşya bağışla</h1><div class="empty"><p>Bağış yapmak için bağışçı hesabıyla giriş yapın.</p><p><a class="btn btn-primary" href="#/kayit/bagisci">Bağışçı olarak kayıt ol</a> <a class="btn btn-outline" href="#/giris">Giriş yap</a></p></div>`;
+    }
+    const mine = state.items.filter((i) => i.donorId === u.id).sort((a, b) => b.createdAt - a.createdAt);
+    return `<h1>Eşya bağışla</h1>
+    <div class="form-wrap">
+      <form class="card" id="donForm" novalidate>
+        <div class="field"><label for="d-title">Eşyanın adı</label><input id="d-title" name="title" required placeholder="Örneğin bulaşık makinesi"></div>
+        <div class="row2">
+          <div class="field"><label for="d-cat">Kategori</label><select id="d-cat" name="category">${CATS.map((c) => `<option>${c}</option>`).join("")}</select></div>
+          <div class="field"><label for="d-cond">Durumu</label><select id="d-cond" name="condition"><option>Az kullanılmış</option><option>İyi</option><option>Orta</option></select></div>
+        </div>
+        <div class="field"><label for="d-desc">Açıklama</label><textarea id="d-desc" name="desc" placeholder="Ölçü, yaş, varsa kusurları"></textarea></div>
+        <div class="field"><label for="d-photo">Fotoğraf (isteğe bağlı)</label><input id="d-photo" name="photo" type="file" accept="image/*"><span class="hint">Fotoğrafta kişi görüntüsü olmamalı.</span><img class="photo-prev" id="photoPrev" alt="Seçilen fotoğrafın önizlemesi"></div>
+        <p class="err" id="donErr" hidden></p>
+        <button class="btn btn-primary" type="submit">Bağışı gönder</button>
+        <p class="hint muted" style="font-size:13.5px;margin-top:10px">İkinci el kıyafet ve giyim ürünleri kabul edilmez.</p>
+      </form>
+      <aside class="card aside-note"><h3>Sonra ne olur?</h3><p>Bağışınız Kızılay paneline düşer. Kızılay gerekirse sizi arayarak eşyayı teyit eder, uygun bulursa 30 gün süreyle vitrinde yayımlar. Eşya teslim alınana kadar sizde kalır.</p></aside>
+    </div>
+    <div class="card" style="margin-top:16px"><h2>Bağışlarım</h2>
+      ${mine.length ? `<div class="table-wrap"><table><thead><tr><th>Eşya</th><th>Tarih</th><th>Durum</th></tr></thead><tbody>${mine.map((it) => `<tr><td><div class="with-thumb">${visual(it, "thumb")}</div><div>${esc(it.title)}<div class="sub">${esc(it.category)}</div></div></div></td><td>${fmtDate(it.createdAt)}</td><td>${badge(ITEM_STATUS, it.status)}</td></tr>`).join("")}</tbody></table></div>` : `<p class="muted">Henüz bağışınız yok.</p>`}
+    </div>`;
+  }
+
+  function viewHesabim() {
+    const u = me();
+    if (!u) return `<div class="empty"><p>Hesabınızı görmek için giriş yapın.</p><a class="btn btn-primary" href="#/giris">Giriş yap</a></div>`;
+    const notes = state.notifications.filter((n) => n.userId === u.id).sort((a, b) => b.t - a.t);
+    notes.forEach((n) => (n.read = true)); save();
+    let body = "";
+    if (u.role === "ihtiyac") {
+      const reqs = state.requests.filter((r) => r.userId === u.id).sort((a, b) => b.createdAt - a.createdAt);
+      body = `<div class="card"><h2>Hesap durumu</h2><p>${badge(USER_STATUS, u.status)}</p>${u.status === "onay-bekliyor" ? `<p class="muted">SYDV kaydınızı doğruladıktan sonra vitrindeki eşyaları talep edebilirsiniz.</p>` : ""}</div>
+      <div class="card"><h2>Taleplerim</h2>${reqs.length ? `<div class="table-wrap"><table><thead><tr><th>Eşya</th><th>Talep tarihi</th><th>Durum</th></tr></thead><tbody>${reqs.map((r) => { const it = item(r.itemId); return `<tr><td>${esc(it ? it.title : "-")}</td><td>${fmtDate(r.createdAt)}</td><td>${badge(REQ_STATUS, r.status)}</td></tr>`; }).join("")}</tbody></table></div>` : `<p class="muted">Henüz talebiniz yok. <a href="#/vitrin">Vitrine göz atın.</a></p>`}</div>`;
+    } else {
+      body = `<div class="card"><h2>Bağışlarım</h2><p><a class="btn btn-primary" href="#/bagis">Bağışlarımı gör ve yeni bağış ekle</a></p></div>`;
+    }
+    return `<h1>Hesabım</h1>
+    <div class="form-wrap"><div>${body}</div>
+      <aside class="card"><h2>Bildirimler</h2>${notes.length ? `<ul class="log">${notes.map((n) => `<li><time>${fmtTime(n.t)}</time><span>${esc(n.text)}</span></li>`).join("")}</ul>` : `<p class="muted">Yeni bildiriminiz yok.</p>`}<p class="note-staff">İlk sürümde bildirimler sistem içinde gösterilir; SMS sonradan eklenebilir.</p></aside>
+    </div>`;
+  }
+
+  /* ---------- Kızılay paneli ---------- */
+  function viewKizilay(tab = "inceleme") {
+    const pending = state.items.filter((i) => i.status === "inceleme");
+    const logistics = state.items.filter((i) => ["tahsis", "teslim-alindi"].includes(i.status));
+    const live = state.items.filter((i) => ["vitrinde", "degerlendirme"].includes(i.status));
+    const done = state.items.filter((i) => ["tamamlandi", "reddedildi", "pasif"].includes(i.status));
+    const tabs = [["inceleme", "İnceleme bekleyen", pending.length], ["vitrin", "Vitrindeki ilanlar", live.length], ["lojistik", "Lojistik ve teslimat", logistics.length], ["gecmis", "Geçmiş", done.length]];
+    let content = "";
+    const donorCell = (it) => { const d = user(it.donorId); return d ? `${esc(d.name)}<div class="sub">${esc(d.phone)} · T.C. ${maskTc(d.tc)}<br>${esc(d.district || "")}</div>` : "-"; };
+    const itemCell = (it) => `<div class="with-thumb">${visual(it, "thumb")}</div><div>${esc(it.title)}<div class="sub">${esc(it.category)} · ${esc(it.condition)}${it.desc ? " · " + esc(it.desc) : ""}</div></div></div>`;
+    if (tab === "inceleme") {
+      content = pending.length ? `<div class="table-wrap"><table><thead><tr><th>Eşya</th><th>Bağışçı</th><th>Kayıt</th><th>İşlem</th></tr></thead><tbody>${pending.map((it) => `<tr><td>${itemCell(it)}</td><td>${donorCell(it)}</td><td>${fmtDate(it.createdAt)}</td><td><div class="actions"><button class="btn btn-kiz btn-sm" data-act="k-approve" data-id="${it.id}">Onayla ve vitrinde yayımla</button><button class="btn btn-danger btn-sm" data-act="k-reject" data-id="${it.id}">Reddet</button></div></td></tr>`).join("")}</tbody></table></div>` : `<div class="empty">İnceleme bekleyen bağış yok. Bağışçı hesabıyla yeni bir eşya eklediğinizde burada görünür.</div>`;
+    } else if (tab === "vitrin") {
+      content = `<div class="table-wrap"><table><thead><tr><th>Eşya</th><th>Bağışçı</th><th>Yayın</th><th>Durum</th></tr></thead><tbody>${live.map((it) => `<tr><td>${itemCell(it)}</td><td>${donorCell(it)}</td><td>${fmtDate(it.publishedAt)}<div class="sub">${daysLeft(it)} gün kaldı</div></td><td>${badge(ITEM_STATUS, it.status)}</td></tr>`).join("")}</tbody></table></div><p class="note-staff">30 gün dolduğunda ilan otomatik olarak pasife alınır; bağışçı teyidi ve Kızılay onayıyla yeniden yayımlanabilir. SYDV değerlendirmesi süren ilanlar beklemede kalır.</p>`;
+    } else if (tab === "lojistik") {
+      content = logistics.length ? `<div class="table-wrap"><table><thead><tr><th>Eşya</th><th>Bağışçıdan alınacak</th><th>Teslim edilecek</th><th>Durum ve işlem</th></tr></thead><tbody>${logistics.map((it) => { const r = user(it.allocatedTo); return `<tr><td>${itemCell(it)}</td><td>${donorCell(it)}</td><td>${r ? `${esc(r.name)}<div class="sub">${esc(r.phone)}<br>${esc(r.address)}</div>` : "-"}</td><td>${badge(ITEM_STATUS, it.status)}<div class="actions" style="margin-top:6px">${it.status === "tahsis" ? `<button class="btn btn-kiz btn-sm" data-act="k-pickup" data-id="${it.id}">Bağışçıdan teslim alındı</button>` : `<button class="btn btn-kiz btn-sm" data-act="k-deliver" data-id="${it.id}">İhtiyaç sahibine teslim edildi</button>`}</div></td></tr>`; }).join("")}</tbody></table></div>` : `<div class="empty">Teslimat bekleyen eşya yok. SYDV bir talebi onayladığında eşya burada görünür.</div>`;
+    } else {
+      content = done.length ? `<div class="table-wrap"><table><thead><tr><th>Eşya</th><th>Bağışçı</th><th>Son durum</th></tr></thead><tbody>${done.map((it) => `<tr><td>${itemCell(it)}</td><td>${donorCell(it)}</td><td>${badge(ITEM_STATUS, it.status)}</td></tr>`).join("")}</tbody></table></div>` : `<div class="empty">Kayıt yok.</div>`;
+    }
+    return `<div class="theme-kiz"><div class="panel-head"><span class="tag" style="background:var(--kiz)">Kızılay paneli</span><p>Türk Kızılay Ödemiş Şubesi · bağış inceleme, vitrin ve lojistik</p></div>
+      <div class="tabs" role="tablist">${tabs.map(([k, t, n]) => `<a class="tab" role="tab" aria-selected="${k === tab}" href="#/panel/kizilay/${k}">${t}<span class="n">${n}</span></a>`).join("")}</div>
+      ${content}
+      <p class="note-staff">Demo: gerçek sürümde bu panele yalnızca yetkili Kızılay personeli kurumsal hesapla girer. İhtiyaç sahibi bilgileri yalnız teslimat sekmesinde görünür.</p></div>`;
+  }
+
+  /* ---------- SYDV paneli ---------- */
+  function ruleWarnings(req) {
+    const it = item(req.itemId);
+    const w = [];
+    const past = state.requests.filter((r) => r.userId === req.userId && r.status === "teslim").map((r) => item(r.itemId)).filter(Boolean);
+    const recent = past.filter((p) => p.deliveredAt && Date.now() - p.deliveredAt < 90 * DAY);
+    if (recent.length) w.push(`Bu haneye son 90 günde tahsis yapıldı (${fmtDate(recent[0].deliveredAt)}). Tahsis için SYDV istisna kararı gerekir.`);
+    const sameCat = past.filter((p) => it && p.category === it.category && p.deliveredAt && Date.now() - p.deliveredAt < 365 * DAY);
+    if (sameCat.length) w.push(`Aynı türde eşya (${esc(it.category)}) son bir yıl içinde teslim edilmiş.`);
+    return w;
+  }
+  function viewSydv(tab = "basvurular") {
+    const apps = state.users.filter((u) => u.role === "ihtiyac" && u.status === "onay-bekliyor");
+    const reqs = state.requests.filter((r) => r.status === "alindi");
+    const approved = state.users.filter((u) => u.role === "ihtiyac" && u.status !== "onay-bekliyor");
+    const tabs = [["basvurular", "İhtiyaç sahibi başvuruları", apps.length], ["talepler", "Ürün talepleri", reqs.length], ["kayitlar", "Kayıtlı ihtiyaç sahipleri", approved.length]];
+    let content = "";
+    if (tab === "basvurular") {
+      content = apps.length ? `<div class="table-wrap"><table><thead><tr><th>Başvuran</th><th>İletişim ve adres</th><th>Hane</th><th>Başvuru</th><th>İşlem</th></tr></thead><tbody>${apps.map((u) => `<tr><td>${esc(u.name)}<div class="sub">T.C. ${maskTc(u.tc)}</div></td><td>${esc(u.phone)}<div class="sub">${esc(u.address)}</div></td><td>${u.household} kişi</td><td>${fmtDate(u.createdAt)}</td><td><div class="actions"><button class="btn btn-sydv btn-sm" data-act="s-approve-user" data-id="${u.id}">Onayla</button><button class="btn btn-danger btn-sm" data-act="s-reject-user" data-id="${u.id}">Reddet</button></div></td></tr>`).join("")}</tbody></table></div>` : `<div class="empty">Bekleyen başvuru yok. Yeni bir ihtiyaç sahibi kaydolduğunda burada görünür.</div>`;
+    } else if (tab === "talepler") {
+      const byItem = {};
+      reqs.forEach((r) => (byItem[r.itemId] = byItem[r.itemId] || []).push(r));
+      content = reqs.length ? Object.entries(byItem).map(([itemId, rs]) => {
+        const it = item(itemId);
+        return `<div class="card" style="margin-bottom:12px"><div class="with-thumb" style="margin-bottom:10px">${visual(it, "thumb")}</div><div><strong>${esc(it.title)}</strong><div class="sub muted">${esc(it.category)} · ${rs.length} talep${rs.length > 1 ? " · aynı ürüne birden fazla talep var, öncelik SYDV kararıdır" : ""}</div></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Talep eden</th><th>Hane</th><th>Talep tarihi</th><th>Kural kontrolü</th><th>Karar</th></tr></thead><tbody>${rs.map((r) => { const u = user(r.userId); const w = ruleWarnings(r); return `<tr><td>${esc(u.name)}<div class="sub">T.C. ${maskTc(u.tc)}</div></td><td>${u.household} kişi</td><td>${fmtDate(r.createdAt)}</td><td>${w.length ? w.map((x) => `<div class="warn">${x}</div>`).join("") : `<span class="badge b-ok">Kurallara uygun</span>`}</td><td><div class="actions"><button class="btn btn-sydv btn-sm" data-act="s-allocate" data-id="${r.id}">${w.length ? "İstisnayla tahsis et" : "Tahsis et"}</button><button class="btn btn-danger btn-sm" data-act="s-reject-req" data-id="${r.id}">Reddet</button></div></td></tr>`; }).join("")}</tbody></table></div></div>`;
+      }).join("") : `<div class="empty">Değerlendirme bekleyen talep yok. Onaylı bir ihtiyaç sahibi vitrinden talep oluşturduğunda burada görünür.</div>`;
+    } else {
+      content = `<div class="table-wrap"><table><thead><tr><th>Ad soyad</th><th>Hane</th><th>Durum</th><th>Onay tarihi</th></tr></thead><tbody>${approved.map((u) => `<tr><td>${esc(u.name)}<div class="sub">T.C. ${maskTc(u.tc)}</div></td><td>${u.household} kişi</td><td>${badge(USER_STATUS, u.status)}</td><td>${u.approvedAt ? fmtDate(u.approvedAt) : "-"}</td></tr>`).join("")}</tbody></table></div><p class="note-staff">İhtiyaç sahipliği yılda bir güncellenir. Ret ve itiraz SYDV'nin mevcut usulüne göre yürütülür.</p>`;
+    }
+    return `<div class="theme-sydv"><div class="panel-head"><span class="tag" style="background:var(--sydv)">SYDV paneli</span><p>Ödemiş Sosyal Yardımlaşma ve Dayanışma Vakfı · ihtiyaç sahibi ve talep değerlendirme</p></div>
+      <div class="tabs" role="tablist">${tabs.map(([k, t, n]) => `<a class="tab" role="tab" aria-selected="${k === tab}" href="#/panel/sydv/${k}">${t}<span class="n">${n}</span></a>`).join("")}</div>
+      ${content}
+      <p class="note-staff">Demo: gerçek sürümde bu panele yalnızca yetkili SYDV personeli kurumsal hesapla girer. Bağışçı bilgileri bu panelde görünmez.</p></div>`;
+  }
+
+  /* ---------- Kaymakamlık özeti ---------- */
+  function viewKaymakamlik() {
+    const cnt = (f) => state.items.filter(f).length;
+    const stats = [
+      [cnt((i) => ["vitrinde", "degerlendirme"].includes(i.status)), "Vitrindeki eşya"],
+      [cnt((i) => i.status === "inceleme"), "Kızılay incelemesinde"],
+      [state.requests.filter((r) => r.status === "alindi").length, "SYDV'de bekleyen talep"],
+      [cnt((i) => ["tahsis", "teslim-alindi"].includes(i.status)), "Teslimat sürecinde"],
+      [cnt((i) => i.status === "tamamlandi"), "Teslim edilen eşya"],
+      [state.users.filter((u) => u.role === "ihtiyac" && u.status === "onayli").length, "Onaylı ihtiyaç sahibi"],
+    ];
+    const events = [];
+    state.items.forEach((it) => it.history.forEach((h) => events.push({ ...h, title: it.title })));
+    (state.log || []).forEach((h) => events.push({ ...h, title: "" }));
+    events.sort((a, b) => b.t - a.t);
+    const stepColor = (s) => COLORS[(STEPS.find((x) => x.n === s) || {}).c] || "#5d6673";
+    return `<div class="panel-head"><span class="tag" style="background:var(--navy)">Kaymakamlık özeti</span><p>Platformun genel durumu ve işlem geçmişi (yalnız görüntüleme)</p></div>
+      <div class="stats">${stats.map(([v, l]) => `<div class="stat"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("")}</div>
+      <div class="card"><h2>İşlem geçmişi</h2><ul class="log">${events.slice(0, 25).map((e) => `<li><time>${fmtTime(e.t)}</time><span class="dot" style="background:${stepColor(e.step)}"></span><span>${e.title ? `<strong>${esc(e.title)}</strong>: ` : ""}${esc(e.text)}</span></li>`).join("")}</ul>
+      <p class="note-staff">Her işlemde işlemi yapan, tarih, önceki ve yeni durum kaydedilir. IP adresi tutulmaz. Veri sorumlusu Ödemiş Kaymakamlığıdır.</p></div>`;
+  }
+
+  /* ---------- Yönlendirme ---------- */
+  function render() {
+    const route = (location.hash || "#/vitrin").slice(1);
+    const parts = route.split("/").filter(Boolean);
+    let html;
+    switch (parts[0]) {
+      case "kayit": html = parts[1] ? viewKayit(parts[1] === "ihtiyac" ? "ihtiyac" : "bagisci") : viewKayitSecim(); break;
+      case "giris": html = viewGiris(); break;
+      case "bagis": html = viewBagis(); break;
+      case "hesabim": html = viewHesabim(); break;
+      case "panel":
+        if (parts[1] === "kizilay") html = viewKizilay(parts[2]);
+        else if (parts[1] === "sydv") html = viewSydv(parts[2]);
+        else html = viewKaymakamlik();
+        break;
+      default: html = viewVitrin();
+    }
+    document.getElementById("app").innerHTML = html;
+    renderNav(route);
+    renderFlow(false);
+    bindForms();
+  }
+
+  /* ---------- Formlar ---------- */
+  function bindForms() {
+    const reg = document.getElementById("regForm");
+    if (reg) reg.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const f = new FormData(reg);
+      const err = document.getElementById("regErr");
+      const ihtiyac = location.hash.includes("ihtiyac");
+      const tc = String(f.get("tc") || "").trim();
+      const missing = !f.get("name") || !f.get("phone") || !/^\d{11}$/.test(tc) || !f.get("kvkk") || (ihtiyac ? !f.get("address") : (!f.get("email") || !f.get("district")));
+      if (missing) { err.hidden = false; err.textContent = !/^\d{11}$/.test(tc) ? "T.C. kimlik numarası 11 haneli olmalı." : "Zorunlu alanları doldurun ve aydınlatma metnini onaylayın."; return; }
+      const u = { id: "u-" + uid(), role: ihtiyac ? "ihtiyac" : "bagisci", name: String(f.get("name")).trim(), tc, phone: String(f.get("phone")).trim(), email: String(f.get("email") || "").trim(), createdAt: Date.now() };
+      if (ihtiyac) Object.assign(u, { address: String(f.get("address")).trim(), household: Number(f.get("household")) || 1, status: "onay-bekliyor" });
+      else u.district = "Ödemiş · " + String(f.get("district")).trim();
+      state.users.push(u);
+      state.currentUserId = u.id;
+      if (ihtiyac) {
+        notify(u.id, "Kaydınız alındı. SYDV kaydınızı doğruladıktan sonra talep oluşturabilirsiniz.");
+        mark(4, `${u.name} ihtiyaç sahibi olarak kayıt oldu, SYDV onayı bekleniyor`);
+        location.hash = "#/hesabim";
+        toast("Kaydınız alındı ve SYDV paneline düştü.");
+      } else {
+        save();
+        location.hash = "#/bagis";
+        toast("Kaydınız tamamlandı. Şimdi bağışınızı ekleyebilirsiniz.");
+      }
+    });
+
+    const don = document.getElementById("donForm");
+    if (don) {
+      const photoInput = document.getElementById("d-photo");
+      let photoData = "";
+      photoInput.addEventListener("change", () => {
+        const file = photoInput.files && photoInput.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            const scale = Math.min(1, 480 / Math.max(img.width, img.height));
+            const c = document.createElement("canvas");
+            c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+            c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+            photoData = c.toDataURL("image/jpeg", 0.72);
+            const prev = document.getElementById("photoPrev"); prev.src = photoData; prev.style.display = "block";
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+      don.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const f = new FormData(don);
+        const title = String(f.get("title") || "").trim();
+        const err = document.getElementById("donErr");
+        if (!title) { err.hidden = false; err.textContent = "Eşyanın adını yazın."; return; }
+        if (/kıyafet|giysi|elbise|mont|ayakkabı|pantolon|gömlek/i.test(title)) { err.hidden = false; err.textContent = "İkinci el kıyafet ve giyim ürünleri kabul edilmiyor."; return; }
+        const it = { id: "i-" + uid(), donorId: me().id, title, category: f.get("category"), condition: f.get("condition"), desc: String(f.get("desc") || "").trim(), photo: photoData, status: "inceleme", createdAt: Date.now(), publishedAt: null, allocatedTo: null, history: [] };
+        state.items.push(it);
+        mark(1, "Bağış kaydı oluşturuldu, Kızılay incelemesine düştü", it);
+        notify(it.donorId, `"${title}" bağışınız alındı. Kızılay incelemesinden sonra size bildirilecek.`);
+        save();
+        render();
+        toast("Bağışınız Kızılay paneline düştü.");
+      });
+    }
+  }
+
+  /* ---------- İşlemler ---------- */
+  document.addEventListener("click", (e) => {
+    const go = e.target.closest("[data-go]");
+    if (go) { location.hash = go.dataset.go; return; }
+    const chip = e.target.closest("[data-cat]");
+    if (chip) { catFilter = chip.dataset.cat; render(); return; }
+    const el = e.target.closest("[data-act]");
+    if (!el) return;
+    const id = el.dataset.id;
+    const act = el.dataset.act;
+    const u = me();
+
+    if (act === "logout") { state.currentUserId = null; save(); location.hash = "#/vitrin"; render(); return; }
+    if (act === "login") { state.currentUserId = id; save(); const lu = user(id); location.hash = lu.role === "bagisci" ? "#/bagis" : "#/vitrin"; toast(`${lu.name} olarak giriş yapıldı.`); return; }
+
+    if (act === "request") {
+      if (!u) { toast("Talep oluşturmak için ihtiyaç sahibi olarak giriş yapın."); location.hash = "#/giris"; return; }
+      if (u.role !== "ihtiyac") { toast("Talep yalnızca ihtiyaç sahibi hesabıyla oluşturulabilir."); return; }
+      if (u.status !== "onayli") { toast("Talep oluşturabilmek için kaydınızın SYDV tarafından onaylanması gerekir."); return; }
+      const active = state.requests.filter((r) => r.userId === u.id && ["alindi", "onaylandi"].includes(r.status)).length;
+      if (active >= 2) { toast("Aynı anda en fazla iki aktif talebiniz olabilir."); return; }
+      const it = item(id);
+      state.requests.push({ id: "r-" + uid(), itemId: id, userId: u.id, status: "alindi", createdAt: Date.now() });
+      if (it.status === "vitrinde") it.status = "degerlendirme";
+      notify(u.id, `"${it.title}" için talebiniz alındı. SYDV değerlendirecek.`);
+      mark(5, `${u.name} talep oluşturdu`, it);
+      render(); toast("Talebiniz SYDV paneline düştü."); return;
+    }
+
+    if (act === "k-approve") {
+      const it = item(id); it.status = "vitrinde"; it.publishedAt = Date.now();
+      it.history.push({ t: Date.now(), text: "Kızılay inceledi", step: 2 });
+      notify(it.donorId, `"${it.title}" bağışınız onaylandı ve 30 gün süreyle vitrinde yayımlandı.`);
+      if (!state.doneSteps.includes(2)) state.doneSteps.push(2);
+      mark(3, "Kızılay onayladı, vitrinde yayımlandı", it);
+      render(); toast("Eşya vitrinde yayımlandı."); return;
+    }
+    if (act === "k-reject") {
+      const it = item(id); it.status = "reddedildi";
+      notify(it.donorId, `"${it.title}" bağışınız uygun bulunmadı. Ayrıntı için Kızılay sizinle iletişime geçecek.`);
+      mark(2, "Kızılay inceledi, bağış uygun bulunmadı", it);
+      render(); toast("Bağış reddedildi, bağışçıya bildirildi."); return;
+    }
+    if (act === "s-approve-user") {
+      const a = user(id); a.status = "onayli"; a.approvedAt = Date.now();
+      notify(a.id, "Kaydınız SYDV tarafından onaylandı. Artık vitrindeki eşyaları talep edebilirsiniz.");
+      mark(4, `SYDV, ${a.name} kaydını onayladı`);
+      render(); toast("İhtiyaç sahibi onaylandı, kişiye bildirildi."); return;
+    }
+    if (act === "s-reject-user") {
+      const a = user(id); a.status = "reddedildi";
+      notify(a.id, "Kaydınız SYDV tarafından onaylanmadı. İtiraz için SYDV'ye başvurabilirsiniz.");
+      mark(4, `SYDV, ${a.name} kaydını reddetti`);
+      render(); toast("Başvuru reddedildi."); return;
+    }
+    if (act === "s-allocate") {
+      const r = state.requests.find((x) => x.id === id); const it = item(r.itemId);
+      r.status = "onaylandi"; it.status = "tahsis"; it.allocatedTo = r.userId;
+      state.requests.filter((x) => x.itemId === it.id && x.id !== r.id && x.status === "alindi").forEach((x) => { x.status = "reddedildi"; notify(x.userId, `"${it.title}" için talebiniz başka bir haneye tahsis edildiği için kapatıldı.`); });
+      notify(r.userId, `"${it.title}" size tahsis edildi. Teslimat için Kızılay sizinle iletişime geçecek.`);
+      notify(it.donorId, `"${it.title}" bağışınız bir ihtiyaç sahibine tahsis edildi. Kızılay teslim almak için sizi arayacak.`);
+      mark(6, `SYDV tahsis kararı verdi (${user(r.userId).name})`, it);
+      render(); toast("Tahsis edildi; eşya Kızılay lojistik listesine düştü."); return;
+    }
+    if (act === "s-reject-req") {
+      const r = state.requests.find((x) => x.id === id); const it = item(r.itemId);
+      r.status = "reddedildi";
+      if (!state.requests.some((x) => x.itemId === it.id && x.status === "alindi") && it.status === "degerlendirme") it.status = "vitrinde";
+      notify(r.userId, `"${it.title}" için talebiniz uygun bulunmadı.`);
+      mark(6, "SYDV talebi uygun bulmadı", it);
+      render(); toast("Talep reddedildi."); return;
+    }
+    if (act === "k-pickup") {
+      const it = item(id); it.status = "teslim-alindi";
+      mark(7, "Kızılay eşyayı bağışçıdan teslim aldı", it);
+      notify(it.allocatedTo, `"${it.title}" yola çıktı. Kızılay teslimat için sizi arayacak.`);
+      render(); toast("Eşya bağışçıdan teslim alındı."); return;
+    }
+    if (act === "k-deliver") {
+      const it = item(id); it.status = "tamamlandi"; it.deliveredAt = Date.now();
+      const r = state.requests.find((x) => x.itemId === it.id && x.status === "onaylandi"); if (r) r.status = "teslim";
+      notify(it.allocatedTo, `"${it.title}" size teslim edildi.`);
+      notify(it.donorId, `"${it.title}" bağışınız ihtiyaç sahibine ulaştı. Teşekkür ederiz.`);
+      mark(8, "Kızılay teslim etti, ilan tamamlandı", it);
+      render(); toast("Teslim tamamlandı, ilan kapatıldı."); return;
+    }
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    if (!confirm("Demo verileri başlangıç hâline dönsün mü?")) return;
+    state = seed(); save(); location.hash = "#/vitrin"; render(); toast("Demo sıfırlandı.");
+  });
+  window.addEventListener("hashchange", () => { render(); window.scrollTo(0, 0); });
+
+  load();
+  render();
+})();
+</script>
+</body>
+</html>
