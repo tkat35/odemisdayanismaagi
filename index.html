@@ -7,18 +7,18 @@
 <meta name="description" content="Ödemiş Dayanışma Ağı işleyişini örnek verilerle gösteren demo sayfası.">
 <style>
   :root {
-    --navy: #1f3557; --green: #3d7a50; --green-soft: #e6f0e9; --kiz: #c8102e; --kiz-soft: #fbe9ec;
+    --navy: #173b57; --green: #168777; --green-soft: #e5f5ee; --kiz: #c8102e; --kiz-soft: #fbe9ec;
     --sydv: #2f6db3; --sydv-soft: #e7eff9; --iht: #c26a1b; --iht-soft: #fbefe3;
-    --ink: #22262c; --muted: #5d6673; --line: #dde3ea; --bg: #f5f7fa; --card: #ffffff;
-    --radius: 10px;
+    --ink: #273b49; --muted: #687b86; --line: #dce6eb; --bg: #f4f8fa; --card: #ffffff;
+    --radius: 14px;
   }
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
-  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; padding-bottom: 120px; }
-  h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; color: var(--navy); line-height: 1.2; margin: 0 0 .5em; }
-  h1 { font-size: clamp(26px, 4vw, 38px); }
-  h2 { font-size: 24px; }
-  h3 { font-size: 18px; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15.5px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; padding-bottom: 120px; }
+  h1, h2, h3 { color: var(--navy); line-height: 1.2; margin: 0 0 .5em; font-weight: 800; }
+  h1 { font-size: clamp(26px, 4vw, 36px); }
+  h2 { font-size: 23px; }
+  h3 { font-size: 17px; }
   p { margin: 0 0 .8em; }
   a { color: var(--sydv); }
   button, input, select, textarea { font: inherit; }
@@ -34,16 +34,17 @@
   .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; margin-right: auto; }
   .brand-mark { width: 38px; height: 38px; border-radius: 50%; background: var(--green); display: grid; place-items: center; }
   .brand-mark svg { width: 22px; height: 22px; }
-  .brand-name { font-family: Georgia, serif; font-weight: 700; color: var(--green); font-size: 19px; line-height: 1.1; }
-  .brand-sub { font-size: 12.5px; color: var(--muted); }
+  .brand-name { font-weight: 850; color: var(--navy); font-size: 20px; line-height: 1.1; }
+  .brand-name b { color: var(--green); font-weight: 850; }
+  .brand-sub { font-size: 11.5px; color: #71818b; }
   nav.main { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   .nav-link { text-decoration: none; color: var(--ink); padding: 7px 12px; border-radius: 8px; font-size: 15px; }
   .nav-link:hover { background: var(--bg); }
   .nav-link.active { background: var(--green-soft); color: var(--green); font-weight: 600; }
-  .btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; border-radius: 8px; padding: 8px 14px; cursor: pointer; font-weight: 600; font-size: 15px; text-decoration: none; line-height: 1.2; }
-  .btn-primary { background: var(--green); color: #fff; }
-  .btn-primary:hover { background: #33683f; }
-  .btn-outline { background: #fff; border-color: var(--line); color: var(--ink); }
+  .btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; border-radius: 9px; padding: 9px 14px; cursor: pointer; font-weight: 700; font-size: 15px; text-decoration: none; line-height: 1.2; }
+  .btn-primary { background: var(--green); border-color: var(--green); color: #fff; }
+  .btn-primary:hover { background: #127265; }
+  .btn-outline { background: #fff; border-color: var(--line); color: var(--navy); }
   .btn-outline:hover { border-color: #b9c3cf; }
   .btn-kiz { background: var(--kiz); color: #fff; }
   .btn-sydv { background: var(--sydv); color: #fff; }
@@ -61,25 +62,35 @@
   .pl.sydv { color: var(--sydv); background: var(--sydv-soft); }
   .pl.kay { color: var(--navy); background: #e8ecf2; }
 
-  main { max-width: 1180px; margin: 0 auto; padding: 24px 16px; }
+  .userbar { font-size: 13px; background: #edf6f3; padding: 8px 0; color: #2a665c; border-bottom: 1px solid var(--line); }
+  .userbar-in { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 16px; min-height: 55vh; }
+  footer.site { background: #fff; border-top: 1px solid var(--line); color: #71818b; font-size: 12.5px; }
+  footer.site div { max-width: 1180px; margin: 0 auto; padding: 16px; }
 
   /* Vitrin */
-  .hero { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; align-items: center; margin-bottom: 22px; }
-  .hero p { color: var(--muted); max-width: 60ch; font-size: 17px; }
-  .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
-  .rules { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; font-size: 14.5px; }
+  .hero { background: #edf5fb url("hero.jpg") center right / cover no-repeat; min-height: 360px; position: relative; display: flex; align-items: center; }
+  .hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(239,248,247,.97) 0%, rgba(239,248,247,.92) 43%, rgba(239,248,247,.24) 70%, rgba(239,248,247,0) 100%); pointer-events: none; }
+  .hero-in { position: relative; z-index: 1; max-width: 1180px; width: 100%; margin: 0 auto; padding: 34px 16px; }
+  .hero h1 { max-width: 600px; margin: 8px 0 12px; font-size: clamp(28px, 4vw, 42px); line-height: 1.1; }
+  .hero p { color: #526976; max-width: 560px; font-size: 16.5px; }
+  .eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--green); font-weight: 800; }
+  .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+  .rules { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 18px; font-size: 14.5px; margin-bottom: 22px; }
   .rules h3 { font-size: 16px; margin-bottom: 6px; }
-  .rules ul { margin: 0; padding-left: 18px; color: var(--muted); }
+  .rules ul { margin: 0; padding-left: 18px; color: var(--muted); columns: 2; column-gap: 32px; }
+  .rules li { break-inside: avoid; margin-bottom: 2px; }
   .filters { display: flex; gap: 8px; flex-wrap: wrap; margin: 6px 0 16px; }
-  .chip { border: 1px solid var(--line); background: #fff; border-radius: 20px; padding: 6px 14px; cursor: pointer; font-size: 14.5px; }
-  .chip[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+  .chip { border: 1px solid var(--line); background: #fff; color: var(--navy); border-radius: 20px; padding: 7px 14px; cursor: pointer; font-size: 14.5px; font-weight: 700; }
+  .chip[aria-pressed="true"] { background: var(--green); border-color: var(--green); color: #fff; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
   .item { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
-  .item-img { aspect-ratio: 4 / 3; display: grid; place-items: center; position: relative; }
-  .item-img img { width: 100%; height: 100%; object-fit: cover; }
-  .item-img svg { width: 42%; height: auto; }
-  .item-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
-  .item-title { font-weight: 700; font-size: 16.5px; }
+  .item-img { height: 150px; display: grid; place-items: center; position: relative; }
+  .item-img img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
+  .item-img svg { width: 34%; height: auto; }
+  .item-body { padding: 13px; display: flex; flex-direction: column; gap: 5px; flex: 1; }
+  .item-title { font-weight: 800; font-size: 17px; color: var(--navy); }
+  .ok-mark { color: var(--green); font-weight: 700; }
   .item-meta { font-size: 13.5px; color: var(--muted); }
   .item-foot { margin-top: auto; display: flex; justify-content: space-between; align-items: center; gap: 8px; padding-top: 6px; }
   .badge { display: inline-block; font-size: 12.5px; padding: 2px 9px; border-radius: 12px; font-weight: 600; white-space: nowrap; }
@@ -99,7 +110,7 @@
   .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 14px; }
   .field label { font-weight: 600; font-size: 14.5px; }
   .field .hint { font-size: 13px; color: var(--muted); }
-  .field input, .field select, .field textarea { border: 1px solid #c5cdd7; border-radius: 8px; padding: 9px 11px; background: #fff; width: 100%; }
+  .field input, .field select, .field textarea { border: 1px solid #d5e0e6; border-radius: 8px; padding: 10px; background: #fff; width: 100%; }
   .field textarea { min-height: 80px; resize: vertical; }
   .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .check { display: flex; gap: 8px; align-items: flex-start; font-size: 14.5px; margin-bottom: 14px; }
@@ -121,7 +132,7 @@
   .tab .n { background: #eceff3; border-radius: 10px; padding: 0 7px; font-size: 12.5px; margin-left: 4px; }
   .table-wrap { overflow-x: auto; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); }
   table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
-  th { text-align: left; background: #f0f3f7; color: var(--muted); font-weight: 600; padding: 10px 12px; font-size: 13.5px; white-space: nowrap; }
+  th { text-align: left; background: #f5f8fa; color: var(--muted); font-weight: 600; padding: 10px 12px; font-size: 13.5px; white-space: nowrap; }
   td { padding: 10px 12px; border-top: 1px solid var(--line); vertical-align: top; }
   td .sub { font-size: 13px; color: var(--muted); }
   .actions { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -135,7 +146,7 @@
   /* Özet */
   .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
   .stat { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; }
-  .stat .v { font-family: Georgia, serif; font-size: 30px; color: var(--navy); font-weight: 700; }
+  .stat .v { font-size: 28px; color: var(--navy); font-weight: 800; }
   .stat .l { font-size: 14px; color: var(--muted); }
   .log { list-style: none; margin: 0; padding: 0; }
   .log li { padding: 8px 0; border-top: 1px solid var(--line); font-size: 14.5px; display: flex; gap: 10px; }
@@ -167,7 +178,10 @@
   .login-opt { display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: #fff; }
 
   @media (max-width: 900px) {
-    .hero, .form-wrap { grid-template-columns: 1fr; }
+    .form-wrap { grid-template-columns: 1fr; }
+    .hero { background-position: 60% center; }
+    .hero::before { background: linear-gradient(90deg, rgba(239,248,247,.97), rgba(239,248,247,.82)); }
+    .rules ul { columns: 1; }
     .panel-links { border-left: none; padding-left: 0; }
     .flow-steps { grid-template-columns: repeat(4, 1fr); }
     .fs .who { display: none; }
@@ -176,6 +190,13 @@
   }
   @media (max-width: 560px) {
     .row2 { grid-template-columns: 1fr; }
+    .hero { min-height: 0; background-image: linear-gradient(110deg, #e8f5f0, #edf5fb); }
+    .hero::before { display: none; }
+    .grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .item-img { height: 100px; }
+    .item-body { padding: 10px; }
+    .item-title { font-size: 15px; }
+    .item-foot { flex-direction: column; align-items: flex-start; }
     .flow-steps { grid-template-columns: repeat(8, 1fr); gap: 3px; }
     .fs { padding: 5px; justify-content: center; }
     .fs .txt { display: none; }
@@ -197,7 +218,7 @@
   <div class="top-in">
     <a class="brand" href="#/vitrin" aria-label="Ödemiş Dayanışma Ağı ana sayfa">
       <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></span>
-      <span><span class="brand-name">Ödemiş Dayanışma Ağı</span><br><span class="brand-sub">Paylaşmanın ortak noktası</span></span>
+      <span><span class="brand-name">Ödemiş <b>Dayanışma Ağı</b></span><br><span class="brand-sub">odemisdayanismaagi.com.tr</span></span>
     </a>
     <nav class="main" aria-label="Ana menü" id="mainNav"></nav>
     <div class="panel-links" aria-label="Yönetim panelleri">
@@ -208,8 +229,11 @@
     </div>
   </div>
 </header>
+<div class="userbar"><div class="userbar-in" id="userbar"></div></div>
+<div id="heroSlot"></div>
 
 <main id="app" tabindex="-1"></main>
+<footer class="site"><div>Ödemiş Dayanışma Ağı · Ödemiş Kaymakamlığı koordinasyonunda Türk Kızılay Ödemiş Şubesi ve Ödemiş SYDV iş birliğiyle · Demo sürümü</div></footer>
 
 <div class="flow" aria-label="Süreç adımları">
   <div class="flow-in">
@@ -224,7 +248,7 @@
   "use strict";
   const DAY = 86400000;
   const KEY = "odemis-dayanisma-demo-v1";
-  const COLORS = { bagisci: "#3d7a50", kizilay: "#c8102e", sydv: "#2f6db3", ihtiyac: "#c26a1b" };
+  const COLORS = { bagisci: "#168777", kizilay: "#c8102e", sydv: "#2f6db3", ihtiyac: "#c26a1b" };
   const STEPS = [
     { n: 1, who: "Bağışçı", c: "bagisci", t: "Bağış kaydı", go: "#/bagis" },
     { n: 2, who: "Kızılay", c: "kizilay", t: "Eşya incelemesi", go: "#/panel/kizilay" },
@@ -348,6 +372,22 @@
       html += `<a class="btn btn-outline btn-sm" href="#/giris">Giriş yap</a><a class="btn btn-primary btn-sm" href="#/kayit">Kayıt ol</a>`;
     }
     document.getElementById("mainNav").innerHTML = html;
+    const roleText = u ? (u.role === "bagisci" ? "Bağışçı" : "İhtiyaç sahibi · " + USER_STATUS[u.status][0]) : "";
+    document.getElementById("userbar").textContent = u
+      ? `Aktif kullanıcı: ${u.name} (${roleText}). Yeni işlemler bu kullanıcı adına kaydedilir.`
+      : "Aktif kullanıcı: seçilmedi. İşlem yapmak için kayıt olun ya da hazır örnek hesaplardan biriyle giriş yapın.";
+  }
+
+  function heroHtml() {
+    return `<section class="hero"><div class="hero-in">
+      <div class="eyebrow">Kurum koordinasyonunda eşya paylaşımı</div>
+      <h1>Kullanılabilir eşyalar, doğru süreçlerle ihtiyaç sahibine ulaşsın.</h1>
+      <p>Vitrindeki her eşya Türk Kızılay Ödemiş Şubesi tarafından incelendi. Talepleri Ödemiş SYDV değerlendirir, teslimatı Kızılay yapar. Bağışçı ve ihtiyaç sahibi birbirinin bilgilerini görmez.</p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#/bagis">Eşya bağışla</a>
+        <a class="btn btn-outline" href="#/kayit/ihtiyac">İhtiyaç sahibi olarak kayıt ol</a>
+      </div>
+    </div></section>`;
   }
 
   /* ---------- Süreç şeridi ---------- */
@@ -365,15 +405,6 @@
       .sort((a, b) => b.publishedAt - a.publishedAt);
     const u = me();
     return `
-    <section class="hero">
-      <div>
-        <h1>İhtiyaç fazlası eşyalar, kurum onayıyla ihtiyaç sahibine ulaşıyor</h1>
-        <p>Vitrindeki her eşya Türk Kızılay Ödemiş Şubesi tarafından incelendi. Talepleri Ödemiş SYDV değerlendirir, teslimatı Kızılay yapar. Bağışçı ve ihtiyaç sahibi birbirinin bilgilerini görmez.</p>
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="#/bagis">Eşya bağışla</a>
-          <a class="btn btn-outline" href="#/kayit/ihtiyac">İhtiyaç sahibi olarak kayıt ol</a>
-        </div>
-      </div>
       <aside class="rules" aria-label="Talep kuralları">
         <h3>Talep kuralları</h3>
         <ul>
@@ -384,8 +415,8 @@
           <li>Kabul edilenler: beyaz eşya, mobilya, mutfak gereçleri. İkinci el kıyafet kabul edilmez.</li>
         </ul>
       </aside>
-    </section>
-    <h2>Vitrin</h2>
+    <h2>Onaylı eşya vitrini</h2>
+    <p class="muted">Örnek ürünler ve Kızılay tarafından onaylanan demo kayıtları.</p>
     <div class="filters" role="group" aria-label="Kategori">
       ${["Tümü", ...CATS].map((c) => `<button type="button" class="chip" data-cat="${c}" aria-pressed="${c === catFilter}">${c}</button>`).join("")}
     </div>
@@ -398,8 +429,9 @@
       return `<article class="item">
         ${visual(it)}${it.status === "degerlendirme" ? `<span class="badge b-blue">Değerlendirme aşamasında</span>` : ""}</div>
         <div class="item-body">
+          <div class="item-meta">${esc(it.category)} · <span class="ok-mark">✓ Onaylı</span></div>
           <div class="item-title">${esc(it.title)}</div>
-          <div class="item-meta">${esc(it.category)} · Durumu: ${esc(it.condition)}</div>
+          <div class="item-meta">Durumu: ${esc(it.condition)} · Ödemiş</div>
           <div class="item-meta">${esc(it.desc)}</div>
           <div class="item-foot"><span class="item-meta">Yayında: ${daysLeft(it)} gün kaldı</span>${btn}</div>
         </div></article>`;
@@ -606,6 +638,8 @@
       default: html = viewVitrin();
     }
     document.getElementById("app").innerHTML = html;
+    const isVitrin = !["kayit", "giris", "bagis", "hesabim", "panel"].includes(parts[0]);
+    document.getElementById("heroSlot").innerHTML = isVitrin ? heroHtml() : "";
     renderNav(route);
     renderFlow(false);
     bindForms();
