@@ -210,8 +210,7 @@
 </head>
 <body>
 <div class="demo-band" role="note">
-  <span>Demo sürümü: tüm kişiler ve eşyalar örnek veridir. Veriler yalnızca bu tarayıcıda tutulur.</span>
-  <button type="button" id="exportBtn">Verileri dosyaya kaydet</button>
+  <span>Demo sürümü: tüm kişiler ve eşyalar örnek veridir. <span id="syncStatus">Veriler yalnızca bu tarayıcıda tutulur.</span></span>
   <button type="button" id="resetBtn">Demoyu sıfırla</button>
 </div>
 
@@ -244,8 +243,6 @@
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<!-- Kayıtlı sunum verisi (varsa). "Verileri dosyaya kaydet" ile üretilir; yoksa yerleşik örnek veri kullanılır. -->
-<script src="demo-veri.js"></script>
 <script>
 (() => {
   "use strict";
@@ -324,25 +321,70 @@
   }
 
   let state;
-  // Başlangıç verisi: depodaki demo-veri.js varsa o, yoksa yerleşik örnek veri
-  const startState = () => (window.DEMO_SEED ? JSON.parse(JSON.stringify(window.DEMO_SEED)) : seed());
+  /* ---------- Ortak kayıt (Google E-Tablo üzerinden) ----------
+     SYNC_URL boşsa veriler yalnız bu tarayıcıda (localStorage) tutulur.
+     Doluysa her değişiklik e-tabloya yazılır, diğer cihazlar birkaç saniyede bir okur.
+     Giriş yapan kullanıcı (currentUserId) cihaza özeldir, paylaşılmaz. */
+  const SYNC_URL = window.DEMO_SYNC_URL || "";
+  const ME_KEY = KEY + "-me";
+  let remoteVersion = 0, pushing = false, pendingPush = false, lastSynced = "";
+
   function load() {
-    try { const raw = localStorage.getItem(KEY); if (raw) { state = JSON.parse(raw); return; } } catch (e) { /* ignore */ }
-    state = startState();
+    try { const raw = localStorage.getItem(KEY); if (raw) state = JSON.parse(raw); } catch (e) { /* ignore */ }
+    if (!state) state = seed();
+    try { state.currentUserId = localStorage.getItem(ME_KEY) || state.currentUserId || null; } catch (e) { /* ignore */ }
   }
-  function exportData() {
-    const copy = JSON.parse(JSON.stringify(state));
-    copy.currentUserId = null; // sunum oturum kapalı başlasın
-    copy.savedAt = Date.now();
-    const text = "// Ödemiş Dayanışma Ağı demo verisi · " + new Date().toLocaleString("tr-TR") + "\nwindow.DEMO_SEED = " + JSON.stringify(copy) + ";\n";
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(new Blob([text], { type: "text/javascript" }));
-    a.download = "demo-veri.js";
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
-    toast("demo-veri.js İndirilenler klasörüne kaydedildi.");
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); localStorage.setItem(ME_KEY, state.currentUserId || ""); } catch (e) { /* yalnız bellekte kalır */ }
+    push(false);
   }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* tarayıcı depolamaya izin vermiyorsa yalnız bellekte kalır */ } }
+  const sharedJson = () => JSON.stringify({ ...state, currentUserId: null });
+  function setSync(ok) {
+    const el = document.getElementById("syncStatus");
+    if (!SYNC_URL) { el.textContent = "Veriler yalnızca bu tarayıcıda tutulur."; return; }
+    el.textContent = ok ? "Ortak kayıt açık: tüm cihazlar aynı veriyi görür." : "Ortak kayda ulaşılamadı; bu tarayıcıda devam ediliyor.";
+  }
+  function applyRemote(data) {
+    remoteVersion = data.version || 0;
+    if (!data.state) return;
+    const mine = state.currentUserId;
+    state = data.state; delete state.version;
+    state.currentUserId = mine && state.users.some((x) => x.id === mine) ? mine : null;
+    lastSynced = sharedJson();
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* ignore */ }
+    render();
+  }
+  async function push(reset) {
+    if (!SYNC_URL) return;
+    const body = sharedJson();
+    if (!reset && body === lastSynced) return;
+    if (pushing) { pendingPush = true; return; }
+    pushing = true;
+    try {
+      const res = await fetch(SYNC_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ baseVersion: remoteVersion, reset: !!reset, state: JSON.parse(body) }) });
+      const data = await res.json();
+      if (data.ok) { remoteVersion = data.version; lastSynced = body; setSync(true); }
+      else if (data.conflict) { pushing = false; applyRemote(data); toast("Başka bir cihazdan işlem yapılmış; ekran güncellendi. Son işleminizi tekrarlayın."); return; }
+    } catch (e) { setSync(false); }
+    pushing = false;
+    if (pendingPush) { pendingPush = false; push(false); }
+  }
+  // Formda yazı yazılırken ekran yenilenmesin
+  function isEditing() {
+    const f = document.querySelector("#app form");
+    if (!f) return false;
+    if (f.contains(document.activeElement)) return true;
+    return [...f.querySelectorAll("input[type=text], input:not([type]), input[type=email], input[type=tel], textarea")].some((el) => el.value.trim());
+  }
+  async function pull() {
+    if (!SYNC_URL || pushing) return;
+    try {
+      const data = await (await fetch(SYNC_URL)).json();
+      setSync(true);
+      if (!data.state) { push(true); return; }            // tablo boş: bu cihazdaki veriyle başlat
+      if (data.version !== remoteVersion && !isEditing() && !pushing) applyRemote(data);
+    } catch (e) { setSync(false); }
+  }
 
   const user = (id) => state.users.find((u) => u.id === id);
   const item = (id) => state.items.find((i) => i.id === id);
@@ -819,14 +861,22 @@
   });
 
   document.getElementById("resetBtn").addEventListener("click", () => {
-    if (!confirm("Demo verileri başlangıç hâline dönsün mü?")) return;
-    state = startState(); save(); location.hash = "#/vitrin"; render(); toast("Demo sıfırlandı.");
+    if (!confirm(SYNC_URL ? "Ortak kayıttaki tüm demo verileri (bütün cihazlar için) başlangıç hâline dönsün mü?" : "Demo verileri başlangıç hâline dönsün mü?")) return;
+    state = seed();
+    try { localStorage.setItem(KEY, JSON.stringify(state)); localStorage.setItem(ME_KEY, ""); } catch (e) { /* ignore */ }
+    push(true); location.hash = "#/vitrin"; render(); toast("Demo sıfırlandı.");
   });
-  document.getElementById("exportBtn").addEventListener("click", exportData);
   window.addEventListener("hashchange", () => { render(); window.scrollTo(0, 0); });
 
   load();
   render();
+  if (!SYNC_URL) setSync(true);
+  else document.getElementById("syncStatus").textContent = "Ortak kayda bağlanılıyor…";
+  if (SYNC_URL) {
+    pull();
+    setInterval(pull, 4000);
+    window.addEventListener("focus", pull);
+  }
 })();
 </script>
 </body>
