@@ -211,6 +211,7 @@
 <body>
 <div class="demo-band" role="note">
   <span>Demo sürümü: tüm kişiler ve eşyalar örnek veridir. Veriler yalnızca bu tarayıcıda tutulur.</span>
+  <button type="button" id="exportBtn">Verileri dosyaya kaydet</button>
   <button type="button" id="resetBtn">Demoyu sıfırla</button>
 </div>
 
@@ -243,6 +244,8 @@
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<!-- Kayıtlı sunum verisi (varsa). "Verileri dosyaya kaydet" ile üretilir; yoksa yerleşik örnek veri kullanılır. -->
+<script src="demo-veri.js"></script>
 <script>
 (() => {
   "use strict";
@@ -321,9 +324,23 @@
   }
 
   let state;
+  // Başlangıç verisi: depodaki demo-veri.js varsa o, yoksa yerleşik örnek veri
+  const startState = () => (window.DEMO_SEED ? JSON.parse(JSON.stringify(window.DEMO_SEED)) : seed());
   function load() {
     try { const raw = localStorage.getItem(KEY); if (raw) { state = JSON.parse(raw); return; } } catch (e) { /* ignore */ }
-    state = seed();
+    state = startState();
+  }
+  function exportData() {
+    const copy = JSON.parse(JSON.stringify(state));
+    copy.currentUserId = null; // sunum oturum kapalı başlasın
+    copy.savedAt = Date.now();
+    const text = "// Ödemiş Dayanışma Ağı demo verisi · " + new Date().toLocaleString("tr-TR") + "\nwindow.DEMO_SEED = " + JSON.stringify(copy) + ";\n";
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text], { type: "text/javascript" }));
+    a.download = "demo-veri.js";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    toast("demo-veri.js İndirilenler klasörüne kaydedildi.");
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { /* tarayıcı depolamaya izin vermiyorsa yalnız bellekte kalır */ } }
 
@@ -803,8 +820,9 @@
 
   document.getElementById("resetBtn").addEventListener("click", () => {
     if (!confirm("Demo verileri başlangıç hâline dönsün mü?")) return;
-    state = seed(); save(); location.hash = "#/vitrin"; render(); toast("Demo sıfırlandı.");
+    state = startState(); save(); location.hash = "#/vitrin"; render(); toast("Demo sıfırlandı.");
   });
+  document.getElementById("exportBtn").addEventListener("click", exportData);
   window.addEventListener("hashchange", () => { render(); window.scrollTo(0, 0); });
 
   load();
